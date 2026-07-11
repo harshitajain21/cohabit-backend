@@ -1,7 +1,11 @@
 package com.cohabit.cohabitbackend.repository;
 
 import com.cohabit.cohabitbackend.model.User;
+import com.cohabit.cohabitbackend.model.Gender;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository        //save(), findAll(), delete(), findById() are all pre-written in JpaRespository
         extends JpaRepository<User, Long> {  //<table, type of primary key>
@@ -12,6 +16,10 @@ public interface UserRepository        //save(), findAll(), delete(), findById()
      */
 
     boolean existsByIitEmail(String iitEmail); //declared another method to check if this email already exists
+
+    Optional<User> findByIitEmail(String iitEmail);
+
+    List<User> findAllByGenderAndYear(Gender gender, Integer year);
 
 }
 

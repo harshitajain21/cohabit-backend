@@ -3,34 +3,32 @@ package com.cohabit.cohabitbackend.mapper;
 import com.cohabit.cohabitbackend.dto.RegisterUserRequest;
 import com.cohabit.cohabitbackend.dto.UserResponse;
 import com.cohabit.cohabitbackend.model.User;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class UserMapper {
+/**
+ * Maps user DTOs and entities without exposing persistence objects through the API layer.
+ */
+@Mapper(componentModel = "spring")
+public interface UserMapper {
 
-    public User toEntity(RegisterUserRequest request) {
+    /**
+     * Converts a registration request into a user entity.
+     *
+     * @param request validated registration payload
+     * @return user entity populated with profile data
+     */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "emailVerified", ignore = true)
+    @Mapping(target = "questionnaireResponse", ignore = true)
+    User toEntity(RegisterUserRequest request);
 
-        User user = new User();
-
-        user.setName(request.name());
-        user.setIitEmail(request.iitEmail());
-        user.setBranch(request.branch());
-        user.setYear(request.year());
-        user.setGender(request.gender());
-        user.setPhoneNumber(request.phoneNumber());
-
-        return user;
-    }
-
-    public UserResponse toResponse(User user) {
-
-        return new UserResponse(
-                user.getId(),
-                user.getName(),
-                user.getIitEmail(),
-                user.getBranch(),
-                user.getYear(),
-                user.getGender()
-        );
-    }
+    /**
+     * Converts a user entity into an API-safe response.
+     *
+     * @param user persisted user
+     * @return user response DTO
+     */
+    UserResponse toResponse(User user);
 }

@@ -2,9 +2,13 @@ package com.cohabit.cohabitbackend.model;
 
 import jakarta.persistence.*;
 
-@Entity //it tells spring that this is a table that should be stored in mySQL
+@Entity //it tells React that this is a table that should be stored in mySQL
 @Table(name = "users")
+
 public class User {
+
+    @OneToOne(mappedBy = "user")
+    private QuestionnaireResponse questionnaireResponse;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //sql generates the id, not java
@@ -14,6 +18,12 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private String iitEmail;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private boolean emailVerified = false;
 
     private String branch;
 
@@ -46,6 +56,14 @@ public class User {
         return iitEmail;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
     public String getBranch() {
         return branch;
     }
@@ -66,6 +84,14 @@ public class User {
         return id;
     }
 
+    public QuestionnaireResponse getQuestionnaireResponse() {
+        return questionnaireResponse;
+    }
+
+    public void setQuestionnaireResponse(QuestionnaireResponse questionnaireResponse) {
+        this.questionnaireResponse = questionnaireResponse;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -76,6 +102,14 @@ public class User {
 
     public void setIitEmail(String iitEmail) {
         this.iitEmail = iitEmail;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
     public void setYear(Integer year) {
