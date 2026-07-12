@@ -5,288 +5,95 @@ import org.springframework.stereotype.Component;
 
 /**
  * Centralizes scoring thresholds, weights, and penalties for roommate matching.
+ *
+ * All component weights are proportional, not absolute -- the engine normalizes by
+ * their sum, so they don't strictly need to total 100. They're kept summing to 100
+ * here purely so the numbers are easy to reason about at a glance.
  */
 @Component
 @ConfigurationProperties(prefix = "cohabit.matching.scoring")
 public class MatchingScoringProperties {
 
+    // Score bounds
     private int minScore = 0;
     private int maxScore = 100;
     private int maxMatches = 10;
+
+    // Report thresholds
     private double strongMatchThreshold = 0.85;
     private double conflictThreshold = 0.65;
-    private int sourceTopPriorityWeight = 6;
-    private int mutualTopPriorityWeight = 8;
-    private int candidateTopPriorityWeight = 4;
-    private int defaultWeight = 2;
-    private double booleanMismatchSimilarity = 0.25;
-    private double dimLightBridgeSimilarity = 0.65;
-    private double oppositeLightSimilarity = 0.35;
-    private double readingRoomBridgeSimilarity = 0.75;
-    private double differentStudyLocationSimilarity = 0.45;
-    private int nightOwlEarlySleeperPenalty = 14;
-    private int darknessFlexibleLightPenalty = 8;
-    private int frequentSpeakerSilencePenalty = 12;
-    private int occasionalSpeakerSilencePenalty = 5;
-    private int oppositeGuestPreferencePenalty = 10;
-    private int extremeCleanlinessPenalty = 12;
-    private int moderateCleanlinessPenalty = 6;
-    private int noSubstanceUsePenalty = 15;
-    private int substanceUseGapPenalty = 8;
-    private int darkEarlySleeperNightOwlPenalty = 12;
-    private int roomStudySilenceSpeakerPenalty = 14;
-    private int introvertGuestPenalty = 8;
-    private int extrovertNoGuestPenalty = 7;
-    private int roomStudyGuestPenalty = 6;
-    private int cleanRelaxedSharingPenalty = 4;
-    private int introvertLanguagePenalty = 5;
-    private int socialSubstanceUsePenalty = 8;
 
-    public int getMinScore() {
-        return minScore;
-    }
+    // Base component weights (proportional; sums to 100 for readability)
+    private double sleepClusterWeight = 25.0;
+    private double studyClusterWeight = 20.0;
+    private double cleanlinessWeight = 20.0;
+    private double substanceUseWeight = 15.0;
+    private double guestPreferenceWeight = 8.0;
+    private double personalityWeight = 7.0;
+    private double sharingPreferenceWeight = 5.0;
 
-    public void setMinScore(int minScore) {
-        this.minScore = minScore;
-    }
+    // Dealbreaker penalty multiplier (points deducted per severity unit of a triggered dealbreaker)
+    private double dealBreakerPenalty = 15.0;
 
-    public int getMaxScore() {
-        return maxScore;
-    }
+    // How strongly a shared "top priority" criterion boosts a component's weight.
+    // boostedWeight = baseWeight * (1 + priorityBoostMultiplier * (matchedSides / 2))
+    // where matchedSides is 0, 1, or 2 depending on how many of the two users flagged
+    // this criterion as a top priority. Symmetric in both users by construction.
+    private double priorityBoostMultiplier = 1.0;
 
-    public void setMaxScore(int maxScore) {
-        this.maxScore = maxScore;
-    }
+    // Shared penalty magnitudes used by SleepClusterCalculator and StudyClusterCalculator
+    private double majorClusterPenalty = 0.35;
+    private double mediumClusterPenalty = 0.20;
+    private double smallClusterPenalty = 0.10;
 
-    public int getMaxMatches() {
-        return maxMatches;
-    }
+    public int getMinScore() { return minScore; }
+    public void setMinScore(int minScore) { this.minScore = minScore; }
 
-    public void setMaxMatches(int maxMatches) {
-        this.maxMatches = maxMatches;
-    }
+    public int getMaxScore() { return maxScore; }
+    public void setMaxScore(int maxScore) { this.maxScore = maxScore; }
 
-    public double getStrongMatchThreshold() {
-        return strongMatchThreshold;
-    }
+    public int getMaxMatches() { return maxMatches; }
+    public void setMaxMatches(int maxMatches) { this.maxMatches = maxMatches; }
 
-    public void setStrongMatchThreshold(double strongMatchThreshold) {
-        this.strongMatchThreshold = strongMatchThreshold;
-    }
+    public double getStrongMatchThreshold() { return strongMatchThreshold; }
+    public void setStrongMatchThreshold(double strongMatchThreshold) { this.strongMatchThreshold = strongMatchThreshold; }
 
-    public double getConflictThreshold() {
-        return conflictThreshold;
-    }
+    public double getConflictThreshold() { return conflictThreshold; }
+    public void setConflictThreshold(double conflictThreshold) { this.conflictThreshold = conflictThreshold; }
 
-    public void setConflictThreshold(double conflictThreshold) {
-        this.conflictThreshold = conflictThreshold;
-    }
+    public double getSleepClusterWeight() { return sleepClusterWeight; }
+    public void setSleepClusterWeight(double sleepClusterWeight) { this.sleepClusterWeight = sleepClusterWeight; }
 
-    public int getSourceTopPriorityWeight() {
-        return sourceTopPriorityWeight;
-    }
+    public double getStudyClusterWeight() { return studyClusterWeight; }
+    public void setStudyClusterWeight(double studyClusterWeight) { this.studyClusterWeight = studyClusterWeight; }
 
-    public void setSourceTopPriorityWeight(int sourceTopPriorityWeight) {
-        this.sourceTopPriorityWeight = sourceTopPriorityWeight;
-    }
+    public double getCleanlinessWeight() { return cleanlinessWeight; }
+    public void setCleanlinessWeight(double cleanlinessWeight) { this.cleanlinessWeight = cleanlinessWeight; }
 
-    public int getMutualTopPriorityWeight() {
-        return mutualTopPriorityWeight;
-    }
+    public double getSubstanceUseWeight() { return substanceUseWeight; }
+    public void setSubstanceUseWeight(double substanceUseWeight) { this.substanceUseWeight = substanceUseWeight; }
 
-    public void setMutualTopPriorityWeight(int mutualTopPriorityWeight) {
-        this.mutualTopPriorityWeight = mutualTopPriorityWeight;
-    }
+    public double getGuestPreferenceWeight() { return guestPreferenceWeight; }
+    public void setGuestPreferenceWeight(double guestPreferenceWeight) { this.guestPreferenceWeight = guestPreferenceWeight; }
 
-    public int getCandidateTopPriorityWeight() {
-        return candidateTopPriorityWeight;
-    }
+    public double getPersonalityWeight() { return personalityWeight; }
+    public void setPersonalityWeight(double personalityWeight) { this.personalityWeight = personalityWeight; }
 
-    public void setCandidateTopPriorityWeight(int candidateTopPriorityWeight) {
-        this.candidateTopPriorityWeight = candidateTopPriorityWeight;
-    }
+    public double getSharingPreferenceWeight() { return sharingPreferenceWeight; }
+    public void setSharingPreferenceWeight(double sharingPreferenceWeight) { this.sharingPreferenceWeight = sharingPreferenceWeight; }
 
-    public int getDefaultWeight() {
-        return defaultWeight;
-    }
+    public double getDealBreakerPenalty() { return dealBreakerPenalty; }
+    public void setDealBreakerPenalty(double dealBreakerPenalty) { this.dealBreakerPenalty = dealBreakerPenalty; }
 
-    public void setDefaultWeight(int defaultWeight) {
-        this.defaultWeight = defaultWeight;
-    }
+    public double getPriorityBoostMultiplier() { return priorityBoostMultiplier; }
+    public void setPriorityBoostMultiplier(double priorityBoostMultiplier) { this.priorityBoostMultiplier = priorityBoostMultiplier; }
 
-    public double getBooleanMismatchSimilarity() {
-        return booleanMismatchSimilarity;
-    }
+    public double getMajorClusterPenalty() { return majorClusterPenalty; }
+    public void setMajorClusterPenalty(double majorClusterPenalty) { this.majorClusterPenalty = majorClusterPenalty; }
 
-    public void setBooleanMismatchSimilarity(double booleanMismatchSimilarity) {
-        this.booleanMismatchSimilarity = booleanMismatchSimilarity;
-    }
+    public double getMediumClusterPenalty() { return mediumClusterPenalty; }
+    public void setMediumClusterPenalty(double mediumClusterPenalty) { this.mediumClusterPenalty = mediumClusterPenalty; }
 
-    public double getDimLightBridgeSimilarity() {
-        return dimLightBridgeSimilarity;
-    }
-
-    public void setDimLightBridgeSimilarity(double dimLightBridgeSimilarity) {
-        this.dimLightBridgeSimilarity = dimLightBridgeSimilarity;
-    }
-
-    public double getOppositeLightSimilarity() {
-        return oppositeLightSimilarity;
-    }
-
-    public void setOppositeLightSimilarity(double oppositeLightSimilarity) {
-        this.oppositeLightSimilarity = oppositeLightSimilarity;
-    }
-
-    public double getReadingRoomBridgeSimilarity() {
-        return readingRoomBridgeSimilarity;
-    }
-
-    public void setReadingRoomBridgeSimilarity(double readingRoomBridgeSimilarity) {
-        this.readingRoomBridgeSimilarity = readingRoomBridgeSimilarity;
-    }
-
-    public double getDifferentStudyLocationSimilarity() {
-        return differentStudyLocationSimilarity;
-    }
-
-    public void setDifferentStudyLocationSimilarity(double differentStudyLocationSimilarity) {
-        this.differentStudyLocationSimilarity = differentStudyLocationSimilarity;
-    }
-
-    public int getNightOwlEarlySleeperPenalty() {
-        return nightOwlEarlySleeperPenalty;
-    }
-
-    public void setNightOwlEarlySleeperPenalty(int nightOwlEarlySleeperPenalty) {
-        this.nightOwlEarlySleeperPenalty = nightOwlEarlySleeperPenalty;
-    }
-
-    public int getDarknessFlexibleLightPenalty() {
-        return darknessFlexibleLightPenalty;
-    }
-
-    public void setDarknessFlexibleLightPenalty(int darknessFlexibleLightPenalty) {
-        this.darknessFlexibleLightPenalty = darknessFlexibleLightPenalty;
-    }
-
-    public int getFrequentSpeakerSilencePenalty() {
-        return frequentSpeakerSilencePenalty;
-    }
-
-    public void setFrequentSpeakerSilencePenalty(int frequentSpeakerSilencePenalty) {
-        this.frequentSpeakerSilencePenalty = frequentSpeakerSilencePenalty;
-    }
-
-    public int getOccasionalSpeakerSilencePenalty() {
-        return occasionalSpeakerSilencePenalty;
-    }
-
-    public void setOccasionalSpeakerSilencePenalty(int occasionalSpeakerSilencePenalty) {
-        this.occasionalSpeakerSilencePenalty = occasionalSpeakerSilencePenalty;
-    }
-
-    public int getOppositeGuestPreferencePenalty() {
-        return oppositeGuestPreferencePenalty;
-    }
-
-    public void setOppositeGuestPreferencePenalty(int oppositeGuestPreferencePenalty) {
-        this.oppositeGuestPreferencePenalty = oppositeGuestPreferencePenalty;
-    }
-
-    public int getExtremeCleanlinessPenalty() {
-        return extremeCleanlinessPenalty;
-    }
-
-    public void setExtremeCleanlinessPenalty(int extremeCleanlinessPenalty) {
-        this.extremeCleanlinessPenalty = extremeCleanlinessPenalty;
-    }
-
-    public int getModerateCleanlinessPenalty() {
-        return moderateCleanlinessPenalty;
-    }
-
-    public void setModerateCleanlinessPenalty(int moderateCleanlinessPenalty) {
-        this.moderateCleanlinessPenalty = moderateCleanlinessPenalty;
-    }
-
-    public int getNoSubstanceUsePenalty() {
-        return noSubstanceUsePenalty;
-    }
-
-    public void setNoSubstanceUsePenalty(int noSubstanceUsePenalty) {
-        this.noSubstanceUsePenalty = noSubstanceUsePenalty;
-    }
-
-    public int getSubstanceUseGapPenalty() {
-        return substanceUseGapPenalty;
-    }
-
-    public void setSubstanceUseGapPenalty(int substanceUseGapPenalty) {
-        this.substanceUseGapPenalty = substanceUseGapPenalty;
-    }
-
-    public int getDarkEarlySleeperNightOwlPenalty() {
-        return darkEarlySleeperNightOwlPenalty;
-    }
-
-    public void setDarkEarlySleeperNightOwlPenalty(int darkEarlySleeperNightOwlPenalty) {
-        this.darkEarlySleeperNightOwlPenalty = darkEarlySleeperNightOwlPenalty;
-    }
-
-    public int getRoomStudySilenceSpeakerPenalty() {
-        return roomStudySilenceSpeakerPenalty;
-    }
-
-    public void setRoomStudySilenceSpeakerPenalty(int roomStudySilenceSpeakerPenalty) {
-        this.roomStudySilenceSpeakerPenalty = roomStudySilenceSpeakerPenalty;
-    }
-
-    public int getIntrovertGuestPenalty() {
-        return introvertGuestPenalty;
-    }
-
-    public void setIntrovertGuestPenalty(int introvertGuestPenalty) {
-        this.introvertGuestPenalty = introvertGuestPenalty;
-    }
-
-    public int getExtrovertNoGuestPenalty() {
-        return extrovertNoGuestPenalty;
-    }
-
-    public void setExtrovertNoGuestPenalty(int extrovertNoGuestPenalty) {
-        this.extrovertNoGuestPenalty = extrovertNoGuestPenalty;
-    }
-
-    public int getRoomStudyGuestPenalty() {
-        return roomStudyGuestPenalty;
-    }
-
-    public void setRoomStudyGuestPenalty(int roomStudyGuestPenalty) {
-        this.roomStudyGuestPenalty = roomStudyGuestPenalty;
-    }
-
-    public int getCleanRelaxedSharingPenalty() {
-        return cleanRelaxedSharingPenalty;
-    }
-
-    public void setCleanRelaxedSharingPenalty(int cleanRelaxedSharingPenalty) {
-        this.cleanRelaxedSharingPenalty = cleanRelaxedSharingPenalty;
-    }
-
-    public int getIntrovertLanguagePenalty() {
-        return introvertLanguagePenalty;
-    }
-
-    public void setIntrovertLanguagePenalty(int introvertLanguagePenalty) {
-        this.introvertLanguagePenalty = introvertLanguagePenalty;
-    }
-
-    public int getSocialSubstanceUsePenalty() {
-        return socialSubstanceUsePenalty;
-    }
-
-    public void setSocialSubstanceUsePenalty(int socialSubstanceUsePenalty) {
-        this.socialSubstanceUsePenalty = socialSubstanceUsePenalty;
-    }
+    public double getSmallClusterPenalty() { return smallClusterPenalty; }
+    public void setSmallClusterPenalty(double smallClusterPenalty) { this.smallClusterPenalty = smallClusterPenalty; }
 }

@@ -52,11 +52,19 @@ public interface FriendRequestMapper {
         }
         return new CompatibilityReportResponse(
                 friendRequest.getOverallScore(),
+                compatibilityBand(friendRequest.getOverallScore()),
                 splitReportItems(friendRequest.getMatchingTraits()),
                 splitReportItems(friendRequest.getPotentialConflicts()),
                 splitReportItems(friendRequest.getDealBreakerConflicts()),
                 splitReportItems(friendRequest.getReasoning())
         );
+    }
+
+    default String compatibilityBand(int score) {
+        if (score >= 85) return "Excellent Match";
+        if (score >= 70) return "Good Match";
+        if (score >= 50) return "Moderate Match";
+        return "Low Compatibility";
     }
 
     /**

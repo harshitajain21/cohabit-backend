@@ -23,16 +23,15 @@ public record QuestionnaireTrait(
     public static List<QuestionnaireTrait> matchingTraits() {
         return List.of(
                 new QuestionnaireTrait(PreferenceCriterion.SLEEP_SCHEDULE, "Sleep schedule", QuestionnaireResponse::getSleepSchedule),
-                new QuestionnaireTrait(PreferenceCriterion.SLEEP_LIGHT_PREFERENCE, "Sleep light preference", QuestionnaireResponse::getSleepLightPreference),
                 new QuestionnaireTrait(PreferenceCriterion.PHONE_VOLUME, "Phone volume", QuestionnaireResponse::getPhoneVolume),
                 new QuestionnaireTrait(PreferenceCriterion.CLEANLINESS, "Cleanliness", QuestionnaireResponse::getCleanliness),
-                new QuestionnaireTrait(PreferenceCriterion.STUDY_LOCATION, "Study location", QuestionnaireResponse::getStudyLocation),
-                new QuestionnaireTrait(PreferenceCriterion.NEED_SILENCE, "Need silence", QuestionnaireResponse::isNeedSilence),
                 new QuestionnaireTrait(PreferenceCriterion.GUEST_PREFERENCE, "Guest preference", QuestionnaireResponse::getGuestPreference),
                 new QuestionnaireTrait(PreferenceCriterion.PERSONALITY, "Personality", QuestionnaireResponse::getPersonality),
                 new QuestionnaireTrait(PreferenceCriterion.SHARING_PREFERENCE, "Sharing preference", QuestionnaireResponse::getSharingPreference),
-                new QuestionnaireTrait(PreferenceCriterion.LANGUAGE_IMPORTANCE, "Language importance", QuestionnaireResponse::getLanguageImportance),
-                new QuestionnaireTrait(PreferenceCriterion.SUBSTANCE_USE, "Substance use", QuestionnaireResponse::getSubstanceUse)
+                new QuestionnaireTrait(PreferenceCriterion.SUBSTANCE_USE, "Substance use", QuestionnaireResponse::getSubstanceUse),
+                new QuestionnaireTrait(PreferenceCriterion.NEED_SILENCE, "Need Silence", QuestionnaireResponse::isNeedSilence),
+                new QuestionnaireTrait(PreferenceCriterion.SLEEP_LIGHT_PREFERENCE, "Light Preference during sleep", QuestionnaireResponse::getSleepLightPreference),
+                new QuestionnaireTrait(PreferenceCriterion.STUDY_LOCATION, "Study Location", QuestionnaireResponse::getStudyLocation)
         );
     }
 }

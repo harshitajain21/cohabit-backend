@@ -7,6 +7,7 @@ import java.util.List;
  */
 public record CompatibilityReportResponse(
         Integer overallScore,
+        String compatibilityBand,
         List<String> matchingTraits,
         List<String> potentialConflicts,
         List<String> dealBreakerConflicts,

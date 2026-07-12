@@ -224,9 +224,9 @@ public class FriendRequestService {
 
     private void applyReport(FriendRequest friendRequest, CompatibilityReport report) {
         friendRequest.setOverallScore(report.overallScore());
-        friendRequest.setMatchingTraits(compatibilityReportGenerator.joinForStorage(report.matchedTraits()));
-        friendRequest.setPotentialConflicts(compatibilityReportGenerator.joinForStorage(report.conflicts()));
-        friendRequest.setDealBreakerConflicts(compatibilityReportGenerator.joinForStorage(report.dealBreakerConflicts()));
-        friendRequest.setReasoning(compatibilityReportGenerator.joinForStorage(report.reasoning()));
+        friendRequest.setMatchingTraits(compatibilityReportGenerator.showproperly(report.matchedTraits()));
+        friendRequest.setPotentialConflicts(compatibilityReportGenerator.showproperly(report.conflicts()));
+        friendRequest.setDealBreakerConflicts(compatibilityReportGenerator.showproperly(report.dealBreakerConflicts()));
+        friendRequest.setReasoning(compatibilityReportGenerator.showproperly(report.reasoning()));
     }
 }

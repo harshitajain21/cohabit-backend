@@ -5,14 +5,13 @@ package com.cohabit.cohabitbackend.model.enums;
  */
 public enum PreferenceCriterion {
     SLEEP_SCHEDULE,
-    SLEEP_LIGHT_PREFERENCE,
     PHONE_VOLUME,
     CLEANLINESS,
-    STUDY_LOCATION,
-    NEED_SILENCE,
     GUEST_PREFERENCE,
     PERSONALITY,
     SHARING_PREFERENCE,
-    LANGUAGE_IMPORTANCE,
-    SUBSTANCE_USE
+    SUBSTANCE_USE,
+    SLEEP_LIGHT_PREFERENCE,
+    NEED_SILENCE,
+    STUDY_LOCATION
 }
