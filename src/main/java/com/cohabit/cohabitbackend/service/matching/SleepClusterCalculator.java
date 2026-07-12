@@ -20,25 +20,25 @@ public class SleepClusterCalculator {
         if (isEarlyDarkVsNightOwl(source, candidate)
                 || isEarlyDarkVsNightOwl(candidate, source)) {
 
-            score += BIG_PENALTY;
+            score -= BIG_PENALTY;
         }
 
         // Rule 2: medium + needs darkness & night owl - mid penalty
         else if (isMediumDarkVsNightOwl(source, candidate)
                 || isMediumDarkVsNightOwl(candidate, source)) {
 
-            score += MID_PENALTY;
+            score -= MID_PENALTY;
         }
 
         // Rule 3: early bird+ dim light & night owl - mid penalty
         else if (isEarlyDimVsNightOwl(source, candidate)
                 || isEarlyDimVsNightOwl(candidate, source)) {
 
-            score += MID_PENALTY;
+            score -= MID_PENALTY;
         }
 
         else {
-            score += NO_PENALTY;
+            score -=0;
         }
 
         return score;
