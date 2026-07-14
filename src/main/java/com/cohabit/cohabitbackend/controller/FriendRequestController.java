@@ -21,33 +21,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.cohabit.cohabitbackend.dto.SendFriendRequestRequest;
 import com.cohabit.cohabitbackend.service.matching.CompatibilityReport;
+import com.cohabit.cohabitbackend.dto.CompatibilityCheckLogResponse;
+import java.util.List;
 
-/**
- * REST controller for friend search and friend request workflows.
- */
+
+//REST controller for friend search and friend request workflows.
+
 @Validated
 @RestController
 @RequestMapping("/friends")
 public class FriendRequestController {
 
     private final FriendRequestService friendRequestService;
-
-    /**
-     * Creates a friend request controller.
-     *
-     * @param friendRequestService friend request service
-     */
     public FriendRequestController(FriendRequestService friendRequestService) {
         this.friendRequestService = friendRequestService;
     }
 
-    /**
-     * Searches for a Cohabit user by IIT email.
-     *
-     * @param iitEmail searched IIT email
-     * @param authentication current Spring Security authentication
-     * @return matching user profile
-     */
+    //Searches for a Cohabit user by IIT email.
     @GetMapping("/search")
     public ResponseEntity<FriendSearchResponse> searchByIitEmail(
             @RequestParam
@@ -60,13 +50,7 @@ public class FriendRequestController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Checks compatibility with another user before sending a friend request.
-     *
-     * @param request friend's IIT email
-     * @param authentication current authenticated user
-     * @return compatibility report
-     */
+    //Checks compatibility with another user before sending a friend request.
     @PostMapping("/check-compatibility")
     public ResponseEntity<CompatibilityReport> checkCompatibility(
             @Valid @RequestBody SendFriendRequestRequest request,
@@ -80,13 +64,14 @@ public class FriendRequestController {
         return ResponseEntity.ok(report);
     }
 
-    /**
-     * Sends a friend request to another Cohabit user.
-     *
-     * @param request friend request payload
-     * @param authentication current Spring Security authentication
-     * @return created friend request
-     */
+    @GetMapping("/check-compatibility/history")
+    public ResponseEntity<List<CompatibilityCheckLogResponse>> getCompatibilityCheckHistory(
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(friendRequestService.getCompatibilityCheckHistory(authentication.getName()));
+    }
+
+    //Sends a friend request to another Cohabit user.
     @PostMapping("/requests")
     public ResponseEntity<FriendRequestResponse> sendFriendRequest(
             @Valid @RequestBody SendFriendRequestRequest request,
@@ -99,13 +84,7 @@ public class FriendRequestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /**
-     * Accepts a pending friend request.
-     *
-     * @param requestId friend request id
-     * @param authentication current Spring Security authentication
-     * @return accepted friend request with report when available
-     */
+    //Accepts a pending friend request.
     @PutMapping("/requests/{requestId}/accept")
     public ResponseEntity<FriendRequestResponse> acceptFriendRequest(
             @PathVariable Long requestId,

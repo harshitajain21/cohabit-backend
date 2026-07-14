@@ -8,32 +8,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Provides database access for questionnaire responses.
- */
+//Provides database access for questionnaire responses.
+
 public interface QuestionnaireResponseRepository extends JpaRepository<QuestionnaireResponse, Long> {
 
-    /**
-     * Checks whether a user already submitted a questionnaire.
-     *
-     * @param user questionnaire owner
-     * @return true when a questionnaire exists for the user
-     */
+    //Checks whether a user already submitted a questionnaire: returns true if so
     boolean existsByUser(User user);
 
-    /**
-     * Finds a questionnaire by owner.
-     *
-     * @param user questionnaire owner
-     * @return questionnaire response when present
-     */
-    Optional<QuestionnaireResponse> findByUser(User user);
+    //Finds a questionnaire by user - returns the response
+    Optional<QuestionnaireResponse> findByUser(User user);  //optional means it can return QuestionnaireResponse or it can return nothing
 
-    /**
-     * Finds questionnaires for a batch of users.
-     *
-     * @param users questionnaire owners
-     * @return questionnaire responses for supplied users
-     */
+    //Finds questionnaires for a batch of users.
     List<QuestionnaireResponse> findAllByUserIn(Collection<User> users);
 }

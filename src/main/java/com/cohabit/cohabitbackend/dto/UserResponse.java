@@ -1,6 +1,6 @@
 package com.cohabit.cohabitbackend.dto;
 
-import com.cohabit.cohabitbackend.model.Gender;
+import com.cohabit.cohabitbackend.model.enums.Gender;
 
 public record UserResponse(
 

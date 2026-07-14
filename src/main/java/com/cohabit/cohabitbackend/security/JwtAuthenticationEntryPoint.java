@@ -11,19 +11,14 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-/**
- * Writes a consistent JSON response for unauthenticated requests.
- */
+//Writes a consistent JSON response for unauthenticated requests.
+
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
 
-    /**
-     * Creates an authentication entry point.
-     *
-     * @param objectMapper JSON mapper
-     */
+    //Creates an authentication entry point.
     public JwtAuthenticationEntryPoint(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }

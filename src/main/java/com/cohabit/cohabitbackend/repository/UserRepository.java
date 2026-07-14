@@ -1,7 +1,7 @@
 package com.cohabit.cohabitbackend.repository;
 
 import com.cohabit.cohabitbackend.model.User;
-import com.cohabit.cohabitbackend.model.Gender;
+import com.cohabit.cohabitbackend.model.enums.Gender;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public interface UserRepository        //save(), findAll(), delete(), findById()
 
     boolean existsByIitEmail(String iitEmail); //declared another method to check if this email already exists
 
-    Optional<User> findByIitEmail(String iitEmail);
+    Optional<User> findByIitEmail(String iitEmail); //optional means it can return User or it can return nothing
 
     List<User> findAllByGenderAndYear(Gender gender, Integer year);
 

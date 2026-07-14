@@ -24,10 +24,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import com.cohabit.cohabitbackend.dto.CompatibilityCheckLogResponse;
+import com.cohabit.cohabitbackend.model.CompatibilityCheckLog;
+import com.cohabit.cohabitbackend.repository.CompatibilityCheckLogRepository;
+import java.util.List;
 
-/**
- * Handles friend search, friend request creation, acceptance, and report generation.
- */
+//Handles friend search, friend request creation, acceptance, and report generation.
+
 @Service
 public class FriendRequestService {
 
@@ -39,19 +42,9 @@ public class FriendRequestService {
     private final IitEmailValidator iitEmailValidator;
     private final CompatibilityEngine compatibilityEngine;
     private final CompatibilityReportGenerator compatibilityReportGenerator;
+    private final CompatibilityCheckLogRepository compatibilityCheckLogRepository;
 
-    /**
-     * Creates a friend request service.
-     *
-     * @param friendRequestRepository friend request repository
-     * @param userRepository user repository
-     * @param questionnaireResponseRepository questionnaire repository
-     * @param roommatePreferenceRepository roommate preference repository
-     * @param friendRequestMapper friend request mapper
-     * @param iitEmailValidator IIT email validator
-     * @param compatibilityEngine compatibility engine
-     * @param compatibilityReportGenerator compatibility report generator
-     */
+    //injects all these in friendrequest service
     public FriendRequestService(
             FriendRequestRepository friendRequestRepository,
             UserRepository userRepository,
@@ -60,7 +53,7 @@ public class FriendRequestService {
             FriendRequestMapper friendRequestMapper,
             IitEmailValidator iitEmailValidator,
             CompatibilityEngine compatibilityEngine,
-            CompatibilityReportGenerator compatibilityReportGenerator
+            CompatibilityReportGenerator compatibilityReportGenerator, CompatibilityCheckLogRepository compatibilityCheckLogRepository
     ) {
         this.friendRequestRepository = friendRequestRepository;
         this.userRepository = userRepository;
@@ -70,15 +63,10 @@ public class FriendRequestService {
         this.iitEmailValidator = iitEmailValidator;
         this.compatibilityEngine = compatibilityEngine;
         this.compatibilityReportGenerator = compatibilityReportGenerator;
+        this.compatibilityCheckLogRepository = compatibilityCheckLogRepository;
     }
 
-    /**
-     * Searches for a user by IIT email.
-     *
-     * @param authenticatedEmail current user's IIT email
-     * @param searchedEmail searched IIT email
-     * @return matching user profile
-     */
+    //Searches for a user by IIT email.
     @Transactional(readOnly = true)
     public FriendSearchResponse searchByIitEmail(String authenticatedEmail, String searchedEmail) {
         String normalizedEmail = iitEmailValidator.normalize(searchedEmail);
@@ -91,13 +79,7 @@ public class FriendRequestService {
         return friendRequestMapper.toSearchResponse(user);
     }
 
-    /**
-     * Sends a friend request and emails the recipient.
-     *
-     * @param requesterEmail authenticated requester's IIT email
-     * @param recipientEmail recipient IIT email
-     * @return created friend request
-     */
+    // Sends a friend request and emails the recipient.
     @Transactional
     public FriendRequestResponse sendFriendRequest(String requesterEmail, String recipientEmail) {
         User requester = findUserByEmail(requesterEmail);
@@ -118,6 +100,23 @@ public class FriendRequestService {
     }
 
     @Transactional(readOnly = true)
+    public List<CompatibilityCheckLogResponse> getCompatibilityCheckHistory(String requesterEmail) {
+        User requester = findUserByEmail(requesterEmail);
+        List<CompatibilityCheckLog> logs =
+                compatibilityCheckLogRepository.findByRequesterOrderByCheckedAtDesc(requester);
+        return friendRequestMapper.toCheckLogResponses(logs);
+    }
+
+    private void logCompatibilityCheck(User requester, User recipient, int overallScore) {
+        CompatibilityCheckLog log = new CompatibilityCheckLog();
+        log.setRequester(requester);
+        log.setRecipient(recipient);
+        log.setOverallScore(overallScore);
+        compatibilityCheckLogRepository.save(log);
+    }
+
+    //gives compatibility report
+    @Transactional
     public CompatibilityReport checkCompatibility(
             String requesterEmail,
             String recipientEmail
@@ -136,22 +135,21 @@ public class FriendRequestService {
                         .orElseThrow(() ->
                                 new RuntimeException("Friend has not completed the questionnaire."));
 
-        return compatibilityEngine.calculateCompatibility(
+        CompatibilityReport report = compatibilityEngine.calculateCompatibility(
                 requesterQuestionnaire,
                 preferenceOrDefault(requester),
                 recipientQuestionnaire,
                 preferenceOrDefault(recipient)
         ).orElseThrow(() ->
                 new RuntimeException("Compatibility could not be calculated."));
+
+        logCompatibilityCheck(requester, recipient, report.overallScore());
+
+        return report;
     }
 
-    /**
-     * Accepts a pending friend request as the recipient.
-     *
-     * @param recipientEmail authenticated recipient's IIT email
-     * @param requestId friend request id
-     * @return accepted friend request with a compatibility report when available
-     */
+    //Accepts a pending friend request as the recipient.
+
     @Transactional
     public FriendRequestResponse acceptFriendRequest(String recipientEmail, Long requestId) {
         User recipient = findUserByEmail(recipientEmail);

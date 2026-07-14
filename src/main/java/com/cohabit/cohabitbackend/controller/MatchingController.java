@@ -10,30 +10,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * REST controller for roommate matching.
- */
+//REST controller for roommate matching.
+
 @RestController
 @RequestMapping("/matches")
 public class MatchingController {
 
     private final MatchingService matchingService;
 
-    /**
-     * Creates a matching controller.
-     *
-     * @param matchingService matching service
-     */
+    //Creates a matching controller.
     public MatchingController(MatchingService matchingService) {
         this.matchingService = matchingService;
     }
 
-    /**
-     * Returns the authenticated user's top roommate matches.
-     *
-     * @param authentication current Spring Security authentication
-     * @return top roommate matches
-     */
+    //Returns the authenticated user's top roommate matches.
     @GetMapping
     public ResponseEntity<List<RoommateMatchResponse>> getTopMatches(Authentication authentication) {
         return ResponseEntity.ok(matchingService.findTopMatches(authentication.getName()));

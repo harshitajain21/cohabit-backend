@@ -15,9 +15,10 @@ import jakarta.persistence.Table;
 
 import java.time.Instant;
 
-/**
- * Represents a friend request between two Cohabit users.
- */
+//Represents a friend request between two Cohabit users.
+
+//contains id, requester, reciepent, status, requestedAt,
+
 @Entity
 @Table(name = "friend_requests")
 public class FriendRequest {

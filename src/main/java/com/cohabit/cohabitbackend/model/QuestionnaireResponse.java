@@ -22,9 +22,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
-/**
- * Stores a user's roommate preference questionnaire response.
- */
+//Stores a user's questionnaire response.
+
+//stores id, user, sleepschedule, sleep light preference, phone volume, cleanliness, study location, need silence, guest preference, personality, sharing preference, language importance, substance use
+
 @Entity
 @Table(name = "questionnaire_responses")
 public class QuestionnaireResponse {
@@ -80,9 +81,7 @@ public class QuestionnaireResponse {
     @Column(nullable = false)
     private SubstanceUse substanceUse;
 
-    /**
-     * Required by JPA.
-     */
+
     public QuestionnaireResponse() {
     }
 

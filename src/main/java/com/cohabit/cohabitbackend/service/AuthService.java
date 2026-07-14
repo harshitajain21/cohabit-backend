@@ -27,9 +27,8 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Base64;
 
-/**
- * Coordinates registration, login, email verification, and verification resends.
- */
+//Coordinates registration, login, email verification, and verification resends.
+
 @Service
 public class AuthService {
 

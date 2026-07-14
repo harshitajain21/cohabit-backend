@@ -6,29 +6,19 @@ import com.cohabit.cohabitbackend.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/**
- * Maps user DTOs and entities without exposing persistence objects through the API layer.
- */
+//Maps user DTOs and entities without exposing persistence objects through the API layer.
+
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    /**
-     * Converts a registration request into a user entity.
-     *
-     * @param request validated registration payload
-     * @return user entity populated with profile data
-     */
+    //Converts a registration request into a user entity.
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "emailVerified", ignore = true)
     @Mapping(target = "questionnaireResponse", ignore = true)
+    //all these tell don't copy id, password, emailverified, questionnairersponse in user entity
     User toEntity(RegisterUserRequest request);
 
-    /**
-     * Converts a user entity into an API-safe response.
-     *
-     * @param user persisted user
-     * @return user response DTO
-     */
+    //Converts a user entity into an API-safe response.
     UserResponse toResponse(User user);
 }

@@ -12,9 +12,8 @@ import jakarta.persistence.Table;
 
 import java.time.Instant;
 
-/**
- * Stores a single-use email verification token for a user account.
- */
+//Stores a single-use email verification token for a user account.
+
 @Entity
 @Table(name = "verification_tokens")
 public class VerificationToken {

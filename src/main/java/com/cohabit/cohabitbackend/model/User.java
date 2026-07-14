@@ -1,6 +1,10 @@
 package com.cohabit.cohabitbackend.model;
 
+import com.cohabit.cohabitbackend.model.enums.Gender;
 import jakarta.persistence.*;
+
+//stores id, name, iitEmail, password, emailverified, branch, year, gender, phonenumber
+//connected with questionnaire response table
 
 @Entity //it tells React that this is a table that should be stored in mySQL
 @Table(name = "users")

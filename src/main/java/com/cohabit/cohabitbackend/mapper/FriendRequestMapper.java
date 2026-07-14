@@ -10,27 +10,18 @@ import org.mapstruct.Mapping;
 
 import java.util.Arrays;
 import java.util.List;
+import com.cohabit.cohabitbackend.dto.CompatibilityCheckLogResponse;
+import com.cohabit.cohabitbackend.model.CompatibilityCheckLog;
 
-/**
- * Maps friend workflow entities into API-safe DTOs.
- */
+// Maps friend workflow entities into API-safe DTOs.
+
 @Mapper(componentModel = "spring")
 public interface FriendRequestMapper {
 
-    /**
-     * Converts a user into a friend search result.
-     *
-     * @param user searched user
-     * @return search response DTO
-     */
+    //Converts a user into a friend search result.
     FriendSearchResponse toSearchResponse(User user);
 
-    /**
-     * Converts a friend request into an API response.
-     *
-     * @param friendRequest friend request entity
-     * @return friend request response DTO
-     */
+    //Converts a friend request into an API response.
     @Mapping(target = "requesterId", source = "requester.id")
     @Mapping(target = "requesterName", source = "requester.name")
     @Mapping(target = "requesterIitEmail", source = "requester.iitEmail")
@@ -40,12 +31,7 @@ public interface FriendRequestMapper {
     @Mapping(target = "compatibilityReport", expression = "java(toCompatibilityReport(friendRequest))")
     FriendRequestResponse toResponse(FriendRequest friendRequest);
 
-    /**
-     * Converts persisted report columns into a compatibility report DTO.
-     *
-     * @param friendRequest accepted friend request
-     * @return compatibility report when available
-     */
+    //Converts persisted report columns into a compatibility report DTO.
     default CompatibilityReportResponse toCompatibilityReport(FriendRequest friendRequest) {
         if (friendRequest.getOverallScore() == null) {
             return null;
@@ -67,12 +53,14 @@ public interface FriendRequestMapper {
         return "Low Compatibility";
     }
 
-    /**
-     * Splits newline-delimited report text into API list items.
-     *
-     * @param value persisted report text
-     * @return report items
-     */
+    @Mapping(target = "recipientId", source = "recipient.id")
+    @Mapping(target = "recipientName", source = "recipient.name")
+    @Mapping(target = "recipientIitEmail", source = "recipient.iitEmail")
+    CompatibilityCheckLogResponse toCheckLogResponse(CompatibilityCheckLog log);
+
+    List<CompatibilityCheckLogResponse> toCheckLogResponses(List<CompatibilityCheckLog> logs);
+
+    //splits newline-delimited report text into API list items.
     default List<String> splitReportItems(String value) {
         if (value == null || value.isBlank()) {
             return List.of();

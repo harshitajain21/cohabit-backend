@@ -18,9 +18,10 @@ import jakarta.persistence.Table;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-/**
- * Stores a user's roommate matching preferences.
- */
+//Stores a user's roommate matching preferences.
+
+//stores id, user, top priorites, dealbreakers, matching enabled or not
+
 @Entity
 @Table(name = "roommate_preferences")
 public class RoommatePreference {

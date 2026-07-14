@@ -14,31 +14,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST controller for authenticated users' roommate preferences.
- */
+//REST controller for authenticated users' roommate preferences.
+
 @RestController
 @RequestMapping("/preferences")
 public class RoommatePreferenceController {
 
     private final RoommatePreferenceService roommatePreferenceService;
-
-    /**
-     * Creates a roommate preference controller.
-     *
-     * @param roommatePreferenceService roommate preference service
-     */
     public RoommatePreferenceController(RoommatePreferenceService roommatePreferenceService) {
         this.roommatePreferenceService = roommatePreferenceService;
     }
 
-    /**
-     * Creates roommate preferences for the authenticated user.
-     *
-     * @param request preference payload
-     * @param authentication current Spring Security authentication
-     * @return created roommate preferences
-     */
+    //Creates roommate preferences for the authenticated user.
     @PostMapping
     public ResponseEntity<RoommatePreferenceResponse> createPreferences(
             @Valid @RequestBody RoommatePreferenceRequest request,
@@ -48,25 +35,15 @@ public class RoommatePreferenceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /**
-     * Retrieves roommate preferences for the authenticated user.
-     *
-     * @param authentication current Spring Security authentication
-     * @return roommate preferences
-     */
+    //Retrieves roommate preferences for the authenticated user.
+
     @GetMapping("/me")
     public ResponseEntity<RoommatePreferenceResponse> getMyPreferences(Authentication authentication) {
         RoommatePreferenceResponse response = roommatePreferenceService.getMyPreferences(authentication.getName());
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Updates roommate preferences for the authenticated user.
-     *
-     * @param request preference payload
-     * @param authentication current Spring Security authentication
-     * @return updated roommate preferences
-     */
+    //Updates roommate preferences for the authenticated user.
     @PutMapping
     public ResponseEntity<RoommatePreferenceResponse> updatePreferences(
             @Valid @RequestBody RoommatePreferenceRequest request,
