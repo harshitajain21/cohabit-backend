@@ -44,8 +44,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
-    }
+    }}
 
+    /*
     //Verifies a registered user's IIT email address.
     @GetMapping("/verify")
     public ResponseEntity<MessageResponse> verify(@RequestParam @NotBlank(message = "Token is required") String token) {
@@ -59,4 +60,4 @@ public class AuthController {
         authService.resendVerification(request.iitEmail());
         return ResponseEntity.ok(new MessageResponse("Verification email sent."));
     }
-}
+}*/

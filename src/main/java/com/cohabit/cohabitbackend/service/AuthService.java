@@ -27,7 +27,8 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Base64;
 
-//Coordinates registration, login, email verification, and verification resends.
+//Coordinates registration, login
+// note: email verification, and verification resends is commented.. not used yet
 
 @Service
 public class AuthService {
@@ -44,19 +45,6 @@ public class AuthService {
     private final SecureRandom secureRandom;
     private final Clock clock;
     private final long verificationTokenExpirationMillis;
-
-    /**
-     * Creates an authentication service with all required collaborators.
-     *
-     * @param userRepository user persistence access
-     * @param verificationTokenRepository verification token persistence access
-     * @param userMapper user mapper
-     * @param passwordEncoder BCrypt password encoder
-     * @param jwtService JWT service
-     * @param userDetailsService Spring Security user-details service
-     * @param iitEmailValidator IIT email validator
-     * @param verificationTokenExpirationMillis token lifetime in milliseconds
-     */
     public AuthService(
             UserRepository userRepository,
             VerificationTokenRepository verificationTokenRepository,
@@ -79,14 +67,10 @@ public class AuthService {
         this.verificationTokenExpirationMillis = verificationTokenExpirationMillis;
     }
 
-    /**
-     * Registers a user and sends the first verification email.
-     *
-     * @param request validated registration payload
-     * @return API-safe user response
-     */
+    // Registers a user and sends the first verification email.
     @Transactional
     public UserResponse register(RegisterUserRequest request) {
+
         String normalizedEmail = iitEmailValidator.normalize(request.iitEmail());
         if (!iitEmailValidator.isValid(normalizedEmail)) {
             throw new AuthenticationFailedException("Only IIT BHU email addresses are allowed.");
@@ -98,20 +82,15 @@ public class AuthService {
         User user = userMapper.toEntity(request);
         user.setIitEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(request.password()));
-        user.setEmailVerified(false);
+        user.setEmailVerified(true);
 
         User savedUser = userRepository.save(user);
-        VerificationToken token = createVerificationToken(savedUser);
+        //VerificationToken token = createVerificationToken(savedUser);
 
         return userMapper.toResponse(savedUser);
     }
 
-    /**
-     * Authenticates a verified user and returns a JWT.
-     *
-     * @param request validated login payload
-     * @return authentication response containing a bearer token
-     */
+    //Authenticates a verified user and returns a JWT.
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         String normalizedEmail = iitEmailValidator.normalize(request.iitEmail());
@@ -132,11 +111,8 @@ public class AuthService {
         return new AuthResponse(jwt, "Bearer", userMapper.toResponse(user));
     }
 
-    /**
-     * Verifies a user account using a single-use token.
-     *
-     * @param tokenValue verification token value
-     */
+    /*
+    //Verifies a user account using a single-use token.
     @Transactional
     public void verifyEmail(String tokenValue) {
         VerificationToken token = verificationTokenRepository.findByToken(tokenValue)
@@ -156,11 +132,7 @@ public class AuthService {
         verificationTokenRepository.save(token);
     }
 
-    /**
-     * Sends a new verification email for an unverified account.
-     *
-     * @param email IIT email address
-     */
+    //Sends a new verification email for an unverified account.
     @Transactional
     public void resendVerification(String email) {
         String normalizedEmail = iitEmailValidator.normalize(email);
@@ -181,5 +153,5 @@ public class AuthService {
         String tokenValue = Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
         Instant expiresAt = Instant.now(clock).plusMillis(verificationTokenExpirationMillis);
         return verificationTokenRepository.save(new VerificationToken(tokenValue, user, expiresAt));
-    }
+    }*/
 }

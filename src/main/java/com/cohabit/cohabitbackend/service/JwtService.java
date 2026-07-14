@@ -29,7 +29,7 @@ public class JwtService {
      * @param expirationMillis access token lifetime in milliseconds
      */
     public JwtService(
-            @Value("${cohabit.jwt.secret:change-me-change-me-change-me-change-me-change-me-change-me}") String secret,
+            @Value("${cohabit.jwt.secret}") String secret,
             @Value("${cohabit.jwt.expiration-millis:86400000}") long expirationMillis
     ) {
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
