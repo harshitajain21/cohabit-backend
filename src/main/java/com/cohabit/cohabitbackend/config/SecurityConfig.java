@@ -5,6 +5,7 @@ import com.cohabit.cohabitbackend.security.JwtAuthenticationEntryPoint;
 import com.cohabit.cohabitbackend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -48,6 +49,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/matches/admin/score").permitAll()
                         .requestMatchers("/auth/register", "/auth/login", "/auth/verify", "/auth/resend-verification").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -85,6 +88,7 @@ public class SecurityConfig {
                 ))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
