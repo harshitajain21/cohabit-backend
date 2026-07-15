@@ -17,8 +17,6 @@ import java.util.List;
 public class MatchingController {
 
     private final MatchingService matchingService;
-
-    //Creates a matching controller.
     public MatchingController(MatchingService matchingService) {
         this.matchingService = matchingService;
     }

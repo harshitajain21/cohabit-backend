@@ -22,9 +22,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Finds and ranks roommate matches for authenticated users.
- */
+//Finds and ranks roommate matches for authenticated users.
+
 @Service
 public class MatchingService {
 
@@ -35,16 +34,6 @@ public class MatchingService {
     private final CompatibilityReportGenerator compatibilityReportGenerator;
     private final MatchingScoringProperties scoringProperties;
 
-    /**
-     * Creates a matching service.
-     *
-     * @param userRepository user repository
-     * @param questionnaireResponseRepository questionnaire repository
-     * @param roommatePreferenceRepository roommate preference repository
-     * @param compatibilityEngine compatibility engine
-     * @param compatibilityReportGenerator report generator
-     * @param scoringProperties centralized scoring properties
-     */
     public MatchingService(
             UserRepository userRepository,
             QuestionnaireResponseRepository questionnaireResponseRepository,
@@ -61,12 +50,7 @@ public class MatchingService {
         this.scoringProperties = scoringProperties;
     }
 
-    /**
-     * Returns the top roommate matches for the authenticated user.
-     *
-     * @param userEmail authenticated user's IIT email
-     * @return top ten roommate matches
-     */
+    //Returns the top roommate matches for the authenticated user.
     @Transactional(readOnly = true)
     public List<RoommateMatchResponse> findTopMatches(String userEmail) {
         User sourceUser = userRepository.findByIitEmail(userEmail)

@@ -7,21 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-/**
- * Provides database access for friend requests.
- */
+//Provides database access for friend requests.
+
 public interface FriendRequestRepository extends JpaRepository<FriendRequest, Long> {
 
-    /**
-     * Finds a friend request between two users in either direction for a status.
-     *
-     * @param requester first requester candidate
-     * @param recipient first recipient candidate
-     * @param reverseRequester second requester candidate
-     * @param reverseRecipient second recipient candidate
-     * @param status request status
-     * @return matching request when present
-     */
+    //Finds a friend request between two users in either direction for a status.
     Optional<FriendRequest> findByRequesterAndRecipientAndStatusOrRequesterAndRecipientAndStatus(
             User requester,
             User recipient,
